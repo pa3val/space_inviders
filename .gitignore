@@ -10,6 +10,8 @@ install_manifest.txt
 CTestTestFile.cmake
 .cmake/
 
+.clang-foramt
+
 *.exe
 *.o
 *.obj

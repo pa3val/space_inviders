@@ -1,13 +1,18 @@
 #pragma once
 
-#include <ncurses.h>
+#include "entity.hpp"
+
 #include <cstdlib>
+#include <ncurses.h>
 
 class GameManager
 {
-  private:
-  int height = 0, width = 0;
-  public:
+private:
+  int            height = 0, width = 0;
+  unsigned short border_size = 1;
+  Entity         player;
+
+public:
   GameManager();
   void initScreen();
   void initColors();
