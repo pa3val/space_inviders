@@ -1,8 +1,8 @@
 BasedOnStyle: WebKit
 IndentWidth: 2
 UseTab: Never
+TabWidth: 2
 BreakBeforeBraces: Allman
-AccessModifierStyle: Unindented
 AccessModifierOffset: -2
 SpaceBeforeParens: ControlStatements
 SpacesInParentheses: false

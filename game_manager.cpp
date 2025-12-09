@@ -4,7 +4,8 @@ GameManager::GameManager()
 {
   initScreen();
   initColors();
-  player = Entity(getmaxx(stdscr), getmaxy(stdscr), border_size);
+  player            = Player(width / 2, height - border_size);
+  collision_manager = CollisionManager(width, height, border_size);
 }
 
 void GameManager::initScreen()
@@ -17,30 +18,7 @@ void GameManager::initScreen()
   getmaxyx(stdscr, height, width);
 }
 
-void GameManager::initColors()
-{
-  init_pair(1, COLOR_BLACK, COLOR_GREEN);
-}
-
-template <typename Obj, typename Func>
-void handleInput(Obj& obj, int key, Func func)
-{
-  switch (key)
-  {
-  case KEY_DOWN:
-    (obj.*func)(0, 1);
-    break;
-  case KEY_UP:
-    (obj.*func)(0, -1);
-    break;
-  case KEY_LEFT:
-    (obj.*func)(-1, 0);
-    break;
-  case KEY_RIGHT:
-    (obj.*func)(1, 0);
-    break;
-  }
-}
+void GameManager::initColors() { init_pair(1, COLOR_BLACK, COLOR_GREEN); }
 
 void GameManager::runGame()
 {
@@ -67,7 +45,24 @@ void GameManager::render()
   clear();
   drawField();
   player.drawObj();
+  drawBullets();
   refresh();
+}
+
+void GameManager::drawBullets()
+{
+  for (auto bullet = bullet_pool.begin();
+      bullet != bullet_pool.end();)
+  {
+    bullet->get()->update();
+    if (collision_manager.checkBoundaryCollision(*(bullet->get())))
+      bullet = bullet_pool.erase(bullet);
+    else
+    {
+      bullet->get()->drawObj();
+      ++bullet;
+    }
+  }
 }
 
 void GameManager::drawField()
