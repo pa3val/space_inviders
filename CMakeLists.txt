@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.10.0)
 project(space_inviders VERSION 0.1.0 LANGUAGES C CXX)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_executable(space_inviders
  main.cpp
@@ -9,6 +10,8 @@ add_executable(space_inviders
  entities/bullet.cpp
  entities/player.cpp
  entities/shooter.cpp
+ entities/enemy.cpp
+ entities/damageable.cpp
  managers/input_manager.cpp
  game_states/level_state.cpp
  managers/renderer.cpp

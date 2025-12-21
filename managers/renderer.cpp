@@ -16,6 +16,21 @@ void Renderer::draw_text(int x, int y, const char* text, ColorPair color_pair)
   attroff(COLOR_PAIR(color));
 }
 
+void Renderer::draw_entity(const Entity& entity, ColorPair color_pair)
+{
+  for (int i = 0; i < entity.getHeight(); ++i)
+  {
+    for (int j = 0; j < entity.getWidth(); ++j)
+    {
+      draw_char(
+          j + entity.getPosX(),
+          i + entity.getPosY(),
+          entity.getAppearance()[i][j],
+          color_pair);
+    }
+  }
+}
+
 void Renderer::refresh_screen()
 {
   refresh();

@@ -1,10 +1,12 @@
 #include "game_manager.hpp"
 
+#include <ncurses.h>
+
 GameManager::GameManager()
 {
   initScreen();
   initColors();
-  state_    = std::make_unique<MenuState>();
+  state_ = std::make_unique<MenuState>();
 }
 
 void GameManager::initScreen()
@@ -20,9 +22,10 @@ void GameManager::initColors()
 {
   init_pair(1, COLOR_GREEN, COLOR_BLACK);
   init_pair(2, COLOR_RED, COLOR_BLACK);
-  init_pair(3, COLOR_BLACK, COLOR_YELLOW);
-  init_pair(4, COLOR_WHITE, COLOR_BLACK);
-  init_pair(5, COLOR_BLACK, COLOR_WHITE);
+  init_pair(3, COLOR_CYAN, COLOR_BLACK);
+  init_pair(4, COLOR_BLACK, COLOR_YELLOW);
+  init_pair(5, COLOR_WHITE, COLOR_BLACK);
+  init_pair(6, COLOR_BLACK, COLOR_WHITE);
 }
 
 void GameManager::runGame()
