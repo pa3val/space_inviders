@@ -1,8 +1,16 @@
 #include "input_manager.hpp"
 
+#include <ncurses.h>
+
 Input InputManager::getInputState()
 {
-  switch (getch())
+  int key = getch();
+  if (key == ERR)
+    return Input::NONE;
+
+  flushinp();
+
+  switch (key)
   {
   case KEY_UP:
     return Input::MOVE_UP;

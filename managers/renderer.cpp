@@ -1,5 +1,9 @@
 #include "renderer.hpp"
 
+#include "constants.hpp"
+
+#include <ncurses.h>
+
 void Renderer::draw_char(int x, int y, char ch, ColorPair color_pair)
 {
   int color = static_cast<int>(color_pair);
@@ -18,27 +22,31 @@ void Renderer::draw_text(int x, int y, const char* text, ColorPair color_pair)
 
 void Renderer::draw_entity(const Entity& entity, ColorPair color_pair)
 {
+  int color = static_cast<int>(color_pair);
+  attron(COLOR_PAIR(color));
+
   for (int i = 0; i < entity.getHeight(); ++i)
   {
     for (int j = 0; j < entity.getWidth(); ++j)
     {
-      draw_char(
-          j + entity.getPosX(),
+      mvaddch(
           i + entity.getPosY(),
-          entity.getAppearance()[i][j],
-          color_pair);
+          j + entity.getPosX(),
+          entity.getAppearance()[i][j]);
     }
   }
+  attroff(COLOR_PAIR(color));
 }
 
 void Renderer::refresh_screen()
 {
+  box(stdscr, 0, 0);
   refresh();
 }
 
 void Renderer::clear_screen()
 {
-  clear();
+  erase();
 }
 
 void Renderer::wait(int millis)

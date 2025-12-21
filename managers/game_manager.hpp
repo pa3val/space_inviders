@@ -1,5 +1,6 @@
 #pragma once
 
+#include "constants.hpp"
 #include "game_state.hpp"
 #include "input_manager.hpp"
 #include "level_state.hpp"

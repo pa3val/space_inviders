@@ -8,6 +8,7 @@
 #include "renderer.hpp"
 #include "signal_manager.hpp"
 
+#include <algorithm>
 #include <memory>
 #include <vector>
 
@@ -24,7 +25,6 @@ public:
   void handleInput(Input input) override;
   void update() override;
   void draw() override;
-  void drawField();
   void drawBullets();
   void drawEnemies();
 };

@@ -1,8 +1,5 @@
 #include "level_state.hpp"
 
-#include "collision_manager.hpp"
-#include "renderer.hpp"
-
 LevelState::LevelState()
 {
   createEnemies();
@@ -51,70 +48,50 @@ void LevelState::handleInput(Input input)
 
 void LevelState::update()
 {
-  // НУЖНО ОПТИМИЗИРОВАТЬ!!!!!!!!!
-  for (auto enemy = enemy_pool_.begin(); enemy != enemy_pool_.end();)
+
+  for (auto bullet = bullet_pool_.begin(); bullet != bullet_pool_.end();)
   {
-    for (auto bullet = bullet_pool_.begin(); bullet != bullet_pool_.end();)
+    for (auto enemy = enemy_pool_.begin(); enemy != enemy_pool_.end(); ++enemy)
     {
       if (CollisionManager::checkCollision(**bullet, **enemy))
       {
         (*enemy)->takeDamage((*bullet)->getDamage());
-        bullet = bullet_pool_.erase(bullet);
-        if (!(*enemy)->isAlive())
-        {
-          enemy = enemy_pool_.erase(enemy);
-          goto next_enemy; // исправить
-        }
-      }
-      else
-      {
-        ++bullet;
+        bullet->reset();
+        break;
       }
     }
-    ++enemy;
-  next_enemy:;
+    ++bullet;
   }
 
-  for (auto bullet = bullet_pool_.begin(); bullet != bullet_pool_.end();)
+  bullet_pool_.erase(
+      std::remove_if(bullet_pool_.begin(), bullet_pool_.end(),
+          [](const auto& bullet)
+          {
+            if (!bullet)
+              return true;
+            return bullet->getPosY() < static_cast<int>(BORDER_SIZE);
+          }),
+      bullet_pool_.end());
+
+  enemy_pool_.erase(
+      std::remove_if(enemy_pool_.begin(), enemy_pool_.end(),
+          [](const auto& enemy)
+          {
+            return !enemy->isAlive();
+          }),
+      enemy_pool_.end());
+      
+  for (auto& bullet : bullet_pool_)
   {
-    if (CollisionManager::checkBounderCollision(**bullet, 0, (*bullet)->getDirection()))
-    {
-      bullet = bullet_pool_.erase(bullet);
-    }
-    else
-    {
-      (*bullet)->update();
-      ++bullet;
-    }
+    bullet->update();
   }
 }
 
 void LevelState::draw()
 {
-  drawField();
   Renderer::draw_entity(player_, ColorPair::PLAYER_COLOR);
   drawBullets();
   drawEnemies();
-}
-
-void LevelState::drawField()
-{
-  for (int i = 0; i < WIDTH; ++i)
-  {
-    for (unsigned short j = 0; j < BORDER_SIZE; ++j)
-    {
-      Renderer::draw_char(i, j, '-', ColorPair::BORDER_COLOR);
-      Renderer::draw_char(i, HEIGHT - 1 - j, '-', ColorPair::BORDER_COLOR);
-    }
-  }
-  for (int i = 1; i < HEIGHT - 1; ++i)
-  {
-    for (unsigned short j = 0; j < BORDER_SIZE; ++j)
-    {
-      Renderer::draw_char(j, i, '|', ColorPair::BORDER_COLOR);
-      Renderer::draw_char(WIDTH - 1 - j, i, '|', ColorPair::BORDER_COLOR);
-    }
-  }
 }
 
 void LevelState::drawBullets()

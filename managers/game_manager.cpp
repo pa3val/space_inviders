@@ -1,7 +1,5 @@
 #include "game_manager.hpp"
 
-#include <ncurses.h>
-
 GameManager::GameManager()
 {
   initScreen();
@@ -12,10 +10,15 @@ GameManager::GameManager()
 void GameManager::initScreen()
 {
   initscr();
+  // printf("\033[8;%d;%dt", HEIGHT, WIDTH);
+  // fflush(stdout);
+  resizeterm(HEIGHT, WIDTH);
   start_color();
-  keypad(stdscr, TRUE);
   nodelay(stdscr, TRUE);
+  keypad(stdscr, TRUE);
   curs_set(0);
+  raw();
+  noecho();
 }
 
 void GameManager::initColors()
@@ -39,7 +42,7 @@ void GameManager::runGame()
     Renderer::clear_screen();
     state_->draw();
     Renderer::refresh_screen();
-    Renderer::wait(50);
+    Renderer::wait(1000 / 30);
   }
   Renderer::exit_screen();
 }
