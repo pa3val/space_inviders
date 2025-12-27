@@ -8,5 +8,6 @@ class Player : public Shooter
 {
 public:
   Player();
+  Player(int pos_x, int pos_y);
   std::unique_ptr<Bullet> shoot() override;
 };

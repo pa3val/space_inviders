@@ -2,16 +2,33 @@
 
 MenuState::MenuState()
 {
-  
+  getFilesInDirectory("levels");
+}
+
+void MenuState::getFilesInDirectory(const std::filesystem::path& path)
+{
+  std::filesystem::directory_iterator it(path);
+  for (const auto& entry : it)
+  {
+    if (entry.is_regular_file() && entry.path().extension() == ".txt")
+    {
+      level_files_.push_back(entry.path().stem().string());
+    }
+  }
 }
 
 void MenuState::draw()
 {
-  Renderer::draw_text(WIDTH / 2, 0, "SPACE INVIDERS", ColorPair::SELECTED_TEXT_COLOR);
+  std::string space_inviders = "SPACE INVIDERS";
+  Renderer::draw_text(WIDTH / 2 - space_inviders.length() / 2, 1, space_inviders, ColorPair::SELECTED_TEXT_COLOR);
   for (std::size_t i = 0; i < menu_text_.size(); ++i)
-    Renderer::draw_text(WIDTH / 2, i + HEIGHT / 2, menu_text_[i], ColorPair::TEXT_COLOR);
-  Renderer::draw_char(WIDTH / 2 - 1, selected_item_ + HEIGHT / 2, '>', ColorPair::SELECTED_TEXT_COLOR);
-  Renderer::draw_text(WIDTH / 2, selected_item_ + HEIGHT / 2, menu_text_[selected_item_], ColorPair::SELECTED_TEXT_COLOR);
+  {
+    if (i == selected_item_)
+      Renderer::draw_text(WIDTH / 2 - menu_text_[selected_item_].length() / 2, selected_item_ + HEIGHT / 2, menu_text_[selected_item_], ColorPair::SELECTED_TEXT_COLOR);
+    else
+      Renderer::draw_text(WIDTH / 2 - menu_text_[i].length() / 2, i + HEIGHT / 2, menu_text_[i], ColorPair::TEXT_COLOR);
+  }
+  Renderer::draw_text(WIDTH / 2 + menu_text_[0].length() / 2 + 3, HEIGHT / 2, '<' + level_files_[selected_level_] + '>', ColorPair::TEXT_COLOR);
 }
 
 void MenuState::handleInput(Input input)
@@ -30,11 +47,27 @@ void MenuState::handleInput(Input input)
     else
       --selected_item_;
     break;
+  case Input::MOVE_RIGHT:
+    if (selected_item_ == 0 && selected_level_ == level_files_.size() - 1)
+      selected_level_ = 0;
+    else if (selected_item_ == 0)
+      ++selected_level_;
+    break;
+  case Input::MOVE_LEFT:
+    if (selected_item_ == 0 && selected_level_ == 0)
+      selected_level_ = level_files_.size() - 1;
+    else if (selected_item_ == 0)
+      --selected_level_;
+    break;
+
   case Input::SELECT:
     if (selected_item_ == menu_text_.size() - 1)
       SignalManager::setSignal(Signals::EXIT);
     else if (selected_item_ == 0)
+    {
       SignalManager::setSignal(Signals::CHANGE_TO_LEVEL);
+      LevelManager::setLevelFile(level_files_[selected_level_]);
+    }
     break;
   default:
     break;

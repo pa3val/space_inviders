@@ -3,9 +3,9 @@
 
 enum class ColorPair
 {
-  BORDER_COLOR = 1,
+  ENEMY_COLOR = 1,
   PLAYER_COLOR,
-  ENEMY_COLOR,
+  BORDER_COLOR,
   BULLET_COLOR,
   TEXT_COLOR,
   SELECTED_TEXT_COLOR
@@ -29,9 +29,10 @@ enum class Signals
   EXIT,
   CHANGE_TO_LEVEL,
   CHANGE_TO_MENU,
+  GAME_OVER,
   NONE
 };
 
-constexpr int HEIGHT                 = 25,
+constexpr int HEIGHT                 = 30,
               WIDTH                  = 80;
 constexpr unsigned short BORDER_SIZE = 1;

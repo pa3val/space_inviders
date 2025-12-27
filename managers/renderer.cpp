@@ -1,9 +1,5 @@
 #include "renderer.hpp"
 
-#include "constants.hpp"
-
-#include <ncurses.h>
-
 void Renderer::draw_char(int x, int y, char ch, ColorPair color_pair)
 {
   int color = static_cast<int>(color_pair);
@@ -12,11 +8,11 @@ void Renderer::draw_char(int x, int y, char ch, ColorPair color_pair)
   attroff(COLOR_PAIR(color));
 }
 
-void Renderer::draw_text(int x, int y, const char* text, ColorPair color_pair)
+void Renderer::draw_text(int x, int y, const std::string& text, ColorPair color_pair)
 {
   int color = static_cast<int>(color_pair);
   attron(COLOR_PAIR(color));
-  mvprintw(y, x, "%s", text);
+  mvprintw(y, x, "%s", text.c_str());
   attroff(COLOR_PAIR(color));
 }
 
@@ -40,7 +36,10 @@ void Renderer::draw_entity(const Entity& entity, ColorPair color_pair)
 
 void Renderer::refresh_screen()
 {
+  attron(COLOR_PAIR(ColorPair::BORDER_COLOR));
   box(stdscr, 0, 0);
+  attroff(COLOR_PAIR(ColorPair::BORDER_COLOR));
+
   refresh();
 }
 

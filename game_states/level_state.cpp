@@ -2,17 +2,22 @@
 
 LevelState::LevelState()
 {
-  createEnemies();
+  lua.open_libraries(sol::lib::base, sol::lib::package);
+  LevelManager::readLevelFile();
+  setupLevel(LevelManager::getLevelFile());
+  enemy_pool_ = LevelManager::takeEnemyPool();
+  player_     = LevelManager::takePlayer();
 }
 
-void LevelState::createEnemies()
+void LevelState::setupLevel(const std::string& level_file)
 {
-  for (int i = 0; i < 10; ++i)
+  lua.script_file("config.lua");
+  enemy_movement_delay = lua["global_state"]["enemy_delay"].get<unsigned short>();
+
+  if (std::filesystem::exists("levels/" + level_file + ".lua"))
   {
-    Enemy enemy;
-    enemy.setPosX(i * enemy.getWidth() + BORDER_SIZE);
-    enemy.setPosY(BORDER_SIZE);
-    enemy_pool_.push_back(std::make_unique<Enemy>(enemy));
+    lua.script_file("levels/" + level_file + ".lua");
+    enemy_movement_delay = lua["level_state"]["enemy_delay"].get<unsigned short>();
   }
 }
 
@@ -48,6 +53,14 @@ void LevelState::handleInput(Input input)
 
 void LevelState::update()
 {
+  for (auto& enemy : enemy_pool_)
+  {
+    if (CollisionManager::checkCollision(player_, *enemy))
+    {
+      SignalManager::setSignal(Signals::GAME_OVER);
+      return;
+    }
+  }
 
   for (auto bullet = bullet_pool_.begin(); bullet != bullet_pool_.end();)
   {
@@ -80,10 +93,24 @@ void LevelState::update()
             return !enemy->isAlive();
           }),
       enemy_pool_.end());
-      
+
   for (auto& bullet : bullet_pool_)
   {
     bullet->update();
+  }
+  moveEnemies();
+}
+
+void LevelState::moveEnemies()
+{
+  ++current_enemy_movement_delay;
+  if (current_enemy_movement_delay >= enemy_movement_delay)
+  {
+    current_enemy_movement_delay = 0;
+    for (auto& enemy : enemy_pool_)
+    {
+      enemy->update(0, 1);
+    }
   }
 }
 

@@ -9,10 +9,10 @@ GameManager::GameManager()
 
 void GameManager::initScreen()
 {
+  printf("\033[8;%d;%dt", HEIGHT, WIDTH);
+  fflush(stdout);
   initscr();
-  // printf("\033[8;%d;%dt", HEIGHT, WIDTH);
-  // fflush(stdout);
-  resizeterm(HEIGHT, WIDTH);
+  resize_term(HEIGHT, WIDTH);
   start_color();
   nodelay(stdscr, TRUE);
   keypad(stdscr, TRUE);
@@ -56,6 +56,10 @@ void GameManager::handleSignal()
     SignalManager::setSignal(Signals::NONE);
     break;
   case Signals::CHANGE_TO_MENU:
+    state_ = std::make_unique<MenuState>();
+    SignalManager::setSignal(Signals::NONE);
+    break;
+  case Signals::GAME_OVER:
     state_ = std::make_unique<MenuState>();
     SignalManager::setSignal(Signals::NONE);
     break;

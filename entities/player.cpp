@@ -15,6 +15,20 @@ Player::Player()
   setPosY(HEIGHT - BORDER_SIZE - appearance.size());
 }
 
+Player::Player(int pos_x, int pos_y)
+    : Shooter()
+{
+  const std::vector<std::vector<char>> appearance = {
+    { '/', '|', '|', '\\' },
+    { '|', '0', '0', '|' },
+    { ' ', '|', '|', ' ' }
+  };
+  setAppearance(appearance);
+  setWidth(appearance[0].size());
+  setHeight(appearance.size());
+  setPosX(pos_x);
+  setPosY(pos_y);
+}
 std::unique_ptr<Bullet> Player::shoot()
 {
   if (canShoot())
