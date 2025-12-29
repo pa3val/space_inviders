@@ -9,16 +9,20 @@ GameManager::GameManager()
 
 void GameManager::initScreen()
 {
-  printf("\033[8;%d;%dt", HEIGHT, WIDTH);
+  printf("\033[8;%d;%dt", SCREEN_HEIGHT, SCREEN_WIDTH);
   fflush(stdout);
   initscr();
-  resize_term(HEIGHT, WIDTH);
+  resize_term(SCREEN_HEIGHT, SCREEN_WIDTH);
   start_color();
-  nodelay(stdscr, TRUE);
-  keypad(stdscr, TRUE);
   curs_set(0);
   raw();
   noecho();
+
+  // Initialize the two windows
+  Renderer::init_windows();
+
+  // Set nodelay on game window for non-blocking input
+  nodelay(Renderer::get_game_window(), TRUE);
 }
 
 void GameManager::initColors()
