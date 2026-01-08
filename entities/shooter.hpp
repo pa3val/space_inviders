@@ -4,14 +4,13 @@
 
 #include <memory>
 
-
-class Shooter : public Entity
+class Shooter
 {
 private:
-  unsigned short reload_frame_delay_         = 5;
-  unsigned short current_reload_frame_delay_ = 0;
-
+  unsigned short                 reload_frame_delay_         = 5;
+  unsigned short                 current_reload_frame_delay_ = 0;
   std::vector<std::vector<char>> bullet_appearance_;
+  unsigned short                 bullet_color_pair_;
 
 public:
   Shooter();
@@ -22,5 +21,7 @@ public:
   void                                  updateReloadFrameDelay();
   void                                  setReloadFrameDelay(unsigned short reload_frame_delay);
   void                                  setBulletAppearance(const std::vector<std::vector<char>>& bullet_appearance);
+  void                                  setBulletColor(const unsigned short bullet_color_pair) { bullet_color_pair_ = bullet_color_pair; }
   const std::vector<std::vector<char>>& getBulletAppearance() const;
+  unsigned short                        getBulletColor() const { return bullet_color_pair_; }
 };

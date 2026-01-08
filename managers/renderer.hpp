@@ -12,11 +12,11 @@
 class Renderer
 {
 private:
-  static WINDOW*                               playfield;
-  static WINDOW*                               info_bar;
-  static bool                                  is_playfield_cleared;
-  static bool                                  is_info_bar_cleared;
-  static std::map<std::string, unsigned short> color_map_;
+  static WINDOW*                                         playfield;
+  static WINDOW*                                         info_bar;
+  static bool                                            is_playfield_cleared;
+  static bool                                            is_info_bar_cleared;
+  static std::unordered_map<std::string, unsigned short> color_map_;
   struct RGBColor
   {
     unsigned int red;
@@ -36,9 +36,9 @@ public:
   static void           initInfoBar();
   static void           initColorMap();
   static void           resetFlags();
-  static void           drawChar(int x, int y, char ch, const std::string& color_name, WindowType window_type);
-  static void           drawText(int x, int y, const std::string& text, const std::string& color_name, WindowType window_type);
-  static void           drawEntity(const Entity& entity, const std::string& color_name, WindowType window_type);
+  static void           drawChar(int x, int y, char ch, WindowType window_type);
+  static void           drawText(int x, int y, const std::string& text, bool is_selected, WindowType window_type);
+  static void           drawEntity(const Entity& entity, WindowType window_type);
   static void           clearWindow(WindowType window_type);
   static void           refreshWindow(WindowType window_type);
   static void           updateScreen();

@@ -15,14 +15,18 @@ add_executable(space_inviders
  entities/shooter.cpp
  entities/enemy.cpp
  entities/damageable.cpp
+ entities/basic_enemy.cpp
+ entities/shooter_enemy.cpp
  managers/input_manager.cpp
  game_states/level_state.cpp
  managers/renderer.cpp
  managers/signal_manager.cpp
  managers/level_manager.cpp
  managers/audio_manager.cpp
+ managers/animator.cpp
  game_states/menu_state.cpp
- game_states/game_over_state.cpp)
+ game_states/game_over_state.cpp
+ game_states/change_level_state.cpp)
 
 find_package(Lua REQUIRED)
 

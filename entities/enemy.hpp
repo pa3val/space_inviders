@@ -1,11 +1,11 @@
 #pragma once
 #include "bullet.hpp"
 #include "damageable.hpp"
-#include "shooter.hpp"
+#include "entity.hpp"
 
 #include <memory>
 
-class Enemy : public Shooter, public Damageable
+class Enemy : public Entity, public Damageable
 {
 private:
   unsigned long  score_                        = 0;
@@ -25,6 +25,5 @@ public:
     if (current_enemy_movement_delay_ > 0)
       --current_enemy_movement_delay_;
   }
-  void                    resetCurrentEnemyMovementDelay() { current_enemy_movement_delay_ = enemy_movement_delay_; }
-  std::unique_ptr<Bullet> shoot() override;
+  void resetCurrentEnemyMovementDelay() { current_enemy_movement_delay_ = enemy_movement_delay_; }
 };

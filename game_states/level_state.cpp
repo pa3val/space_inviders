@@ -46,34 +46,60 @@ void LevelState::handleInput(Input input)
 void LevelState::update()
 {
   player_.updateReloadFrameDelay();
-  for (auto& enemy : enemy_pool_)
+  for (auto& row : enemy_pool_)
   {
-    enemy->updateReloadFrameDelay();
-    enemy->updateCurrentEnemyMovementDelay();
-  }
-
-  for (auto& enemy : enemy_pool_)
-  {
-    if (CollisionManager::checkCollision(player_, *enemy))
+    for (auto& enemy : row)
     {
-      SignalManager::setSignal(Signals::GAME_OVER);
-      return;
-    }
-  }
-
-  for (auto bullet = bullet_pool_.begin(); bullet != bullet_pool_.end();)
-  {
-    for (auto enemy = enemy_pool_.begin(); enemy != enemy_pool_.end(); ++enemy)
-    {
-      if (CollisionManager::checkCollision(**bullet, **enemy))
+      if (auto shooter_enemy = dynamic_cast<ShooterEnemy*>(enemy.get()))
+        shooter_enemy->updateReloadFrameDelay();
+      enemy->updateCurrentEnemyMovementDelay();
+      enemy->animator_.updateAnimation();
+      if (CollisionManager::checkCollision(player_, *enemy))
       {
-        (*enemy)->takeDamage((*bullet)->getDamage());
-        bullet->reset();
-        break;
+        SignalManager::setSignal(Signals::GAME_OVER);
+        return;
       }
     }
+  }
+  for (auto bullet = bullet_pool_.begin(); bullet != bullet_pool_.end();)
+  {
+    if (!(*bullet))
+    {
+      ++bullet;
+      continue;
+    }
+    bool is_bullet_hit = false;
+    for (auto& row : enemy_pool_)
+    {
+      if (row.empty())
+        continue;
+      if ((*bullet)->getDirection() == Bullet::BulletDirection::DOWN)
+        break;
+      for (auto enemy = row.begin(); enemy != row.end(); ++enemy)
+      {
+        if (!(*enemy) || !(*enemy)->isAlive() || (*enemy)->animator_.isAnimationRunning())
+          continue;
+        if (CollisionManager::checkCollision(**bullet, **enemy))
+        {
+          (*enemy)->takeDamage((*bullet)->getDamage());
+          bullet->reset();
+          is_bullet_hit = true;
+          if (!(*enemy)->isAlive())
+          {
+            (*enemy)->animator_.startAnimation();
+            AudioManager::playSound("ENEMY_EXPLOSION_SOUND");
+          }
+          break;
+        }
+      }
+      if (is_bullet_hit)
+        break;
+    }
 
-    if ((*bullet) && CollisionManager::checkCollision(**bullet, player_))
+    if (!is_bullet_hit
+        && (*bullet)
+        && (*bullet)->getDirection() == Bullet::BulletDirection::DOWN
+        && CollisionManager::checkCollision(**bullet, player_))
     {
       player_.takeDamage((*bullet)->getDamage());
       if (!player_.isAlive())
@@ -102,24 +128,35 @@ void LevelState::update()
           }),
       bullet_pool_.end());
 
+  for (auto& row : enemy_pool_)
+  {
+    row.erase(
+        std::remove_if(row.begin(), row.end(),
+            [this](const auto& enemy)
+            {
+              if (!enemy->isAlive() && enemy->animator_.isAnimationFinished())
+              {
+                score_ += enemy->getScore();
+                draw_flags_ |= SignalManager::DrawFlags::DRAW_INFO_BAR;
+                draw_flags_ |= SignalManager::DrawFlags::DRAW_PLAYFIELD;
+                return true;
+              }
+              return false;
+            }),
+        row.end());
+  }
+
   enemy_pool_.erase(
       std::remove_if(enemy_pool_.begin(), enemy_pool_.end(),
-          [this](const auto& enemy)
+          [](const auto& row)
           {
-            if (!enemy->isAlive())
-            {
-              score_ += enemy->getScore();
-              draw_flags_ |= SignalManager::DrawFlags::DRAW_INFO_BAR;
-              draw_flags_ |= SignalManager::DrawFlags::DRAW_PLAYFIELD;
-              return true;
-            }
-            return false;
+            return row.empty();
           }),
       enemy_pool_.end());
 
   if (enemy_pool_.empty())
   {
-    SignalManager::setSignal(Signals::GAME_OVER);
+    SignalManager::setSignal(Signals::GAME_WIN);
     return;
   }
 
@@ -138,29 +175,44 @@ void LevelState::moveEnemies()
 {
   if (enemy_pool_.empty())
     return;
-  short delta_y     = 0;
-  bool  is_collided = false;
-  if ((*enemy_pool_.begin())->getCurrentEnemyMovementDelay() == 0)
+  short delta_y          = 0;
+  bool  is_collided      = false;
+  bool  is_ready_to_move = false;
+  for (auto& row : enemy_pool_)
   {
-    for (auto& enemy : enemy_pool_)
+    for (auto& enemy : row)
     {
-      if (CollisionManager::checkBounderCollision(*enemy, enemy_direction_x_, 0))
+      if (row.empty())
+        continue;
+      if (enemy->getCurrentEnemyMovementDelay() == 0)
       {
-        is_collided = true;
-        break;
+        is_ready_to_move = true;
+        if (CollisionManager::checkBounderCollision(*enemy, enemy_direction_x_, 0))
+        {
+          is_collided = true;
+          break;
+        }
       }
     }
-    if (is_collided)
+  }
+  if (is_collided)
+  {
+    enemy_direction_x_ = -enemy_direction_x_;
+    delta_y            = 1;
+  }
+  if (is_ready_to_move)
+  {
+    for (auto& row : enemy_pool_)
     {
-      enemy_direction_x_ = -enemy_direction_x_;
-      delta_y            = 1;
+      if (row.empty())
+        continue;
+      for (auto& enemy : row)
+      {
+        enemy->update(enemy_direction_x_, delta_y);
+        enemy->resetCurrentEnemyMovementDelay();
+      }
+      draw_flags_ |= SignalManager::DrawFlags::DRAW_PLAYFIELD;
     }
-    for (auto& enemy : enemy_pool_)
-    {
-      enemy->update(enemy_direction_x_, delta_y);
-      enemy->resetCurrentEnemyMovementDelay();
-    }
-    draw_flags_ |= SignalManager::DrawFlags::DRAW_PLAYFIELD;
   }
 }
 
@@ -168,12 +220,20 @@ void LevelState::shootEnemies()
 {
   if (enemy_pool_.empty())
     return;
-  for (auto& enemy : enemy_pool_)
+  for (auto& row : enemy_pool_)
   {
-    if (chance(rng_) <= enemy_shoot_chance_ && enemy->canShoot())
+    if (row.empty())
+      continue;
+    for (auto& enemy : row)
     {
-      bullet_pool_.push_back(enemy->shoot());
-      AudioManager::playSound("ENEMY_SHOOT_SOUND");
+      if (auto shooter_enemy = dynamic_cast<ShooterEnemy*>(enemy.get()))
+      {
+        if (chance(rng_) <= enemy_shoot_chance_ && shooter_enemy->canShoot())
+        {
+          bullet_pool_.push_back(shooter_enemy->shoot());
+          AudioManager::playSound("ENEMY_SHOOT_SOUND");
+        }
+      }
     }
   }
 }
@@ -182,14 +242,14 @@ void LevelState::draw()
 {
   if ((draw_flags_ & SignalManager::DrawFlags::DRAW_PLAYFIELD) != SignalManager::DrawFlags::DRAW_NONE)
   {
-    Renderer::drawEntity(player_, "PLAYER_COLOR", Renderer::WindowType::PLAYFIELD);
-    drawBullets();
+    Renderer::drawEntity(player_, Renderer::WindowType::PLAYFIELD);
     drawEnemies();
+    drawBullets();
   }
   if ((draw_flags_ & SignalManager::DrawFlags::DRAW_INFO_BAR) != SignalManager::DrawFlags::DRAW_NONE)
   {
-    Renderer::drawText(1, 1, "Score: " + std::to_string(score_), "TEXT_COLOR", Renderer::WindowType::INFO_BAR);
-    Renderer::drawText(1, 2, "Health: " + std::to_string(player_.getHealth()), "TEXT_COLOR", Renderer::WindowType::INFO_BAR);
+    Renderer::drawText(1, 1, "Score: " + std::to_string(score_), false, Renderer::WindowType::INFO_BAR);
+    Renderer::drawText(1, 2, "Health: " + std::to_string(player_.getHealth()), false, Renderer::WindowType::INFO_BAR);
   }
   draw_flags_ = SignalManager::DrawFlags::DRAW_NONE;
 }
@@ -199,15 +259,18 @@ void LevelState::drawBullets()
   for (auto& bullet : bullet_pool_)
   {
     if (bullet)
-      Renderer::drawEntity(*bullet, bullet->getColorName(), Renderer::WindowType::PLAYFIELD);
+      Renderer::drawEntity(*bullet, Renderer::WindowType::PLAYFIELD);
   }
 }
 
 void LevelState::drawEnemies()
 {
-  for (auto& enemy : enemy_pool_)
+  for (auto& row : enemy_pool_)
   {
-    if (enemy)
-      Renderer::drawEntity(*enemy, "ALIEN_COLOR", Renderer::WindowType::PLAYFIELD);
+    for (auto& enemy : row)
+    {
+      if (enemy)
+        Renderer::drawEntity(*enemy, Renderer::WindowType::PLAYFIELD);
+    }
   }
 }

@@ -1,7 +1,7 @@
 #pragma once
-#include "constants.hpp"
 
-#include <curses.h>
+#include "animator.hpp"
+
 #include <vector>
 
 class Entity
@@ -10,8 +10,11 @@ private:
   unsigned int                   width_ = 0, height_ = 0;
   int                            pos_x_ = 0, pos_y_ = 0;
   std::vector<std::vector<char>> appearance_;
+  unsigned short                 color_pair_;
 
 public:
+  Animator animator_;
+
   Entity();
   virtual ~Entity() = default;
   virtual void                          update(short delta_x, short delta_y);
@@ -20,6 +23,7 @@ public:
   unsigned int                          getHeight() const { return height_; }
   unsigned int                          getWidth() const { return width_; }
   const std::vector<std::vector<char>>& getAppearance() const { return appearance_; }
+  unsigned short                        getColorPair() const { return color_pair_; }
   void                                  setPosX(int pos_x) { pos_x_ = pos_x; }
   void                                  setPosY(int pos_y) { pos_y_ = pos_y; }
   void                                  setWidth(unsigned int width) { width_ = width; }
@@ -28,4 +32,5 @@ public:
   {
     appearance_ = appearance;
   }
+  void setColor(const unsigned short color_pair) { color_pair_ = color_pair; }
 };

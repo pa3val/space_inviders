@@ -5,21 +5,26 @@
 
 class Bullet : public Entity
 {
+public:
+  enum class BulletDirection
+  {
+    UP   = -1,
+    DOWN = 1,
+  };
+
 private:
-  short        direction = 0;
-  unsigned int damage    = 1;
-  std::string  color_name;
+  BulletDirection direction_;
+  unsigned int    damage_ = 1;
 
 public:
-  Bullet(
-      int                                   p_x,
+  Bullet(int                                p_x,
       int                                   p_y,
-      short                                 direction,
-      std::string                           color_name,
+      BulletDirection                       direction,
+      unsigned short                        color_pair,
       const std::vector<std::vector<char>>& appearance);
+
   virtual ~Bullet() = default;
-  void         update();
-  short        getDirection() const { return direction; }
-  unsigned int getDamage() const { return damage; }
-  std::string  getColorName() const { return color_name; }
+  void            update(short delta_x = 0, short delta_y = 0) override;
+  BulletDirection getDirection() const { return direction_; }
+  unsigned int    getDamage() const { return damage_; }
 };

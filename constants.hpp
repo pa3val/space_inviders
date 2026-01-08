@@ -26,8 +26,10 @@ enum class Input
 enum class Signals
 {
   EXIT,
-  CHANGE_TO_LEVEL,
+  START_GAME,
+  CHANGE_TO_NEXT_LEVEL,
   CHANGE_TO_MENU,
+  GAME_WIN,
   GAME_OVER,
   NONE
 };

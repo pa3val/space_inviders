@@ -1,10 +1,10 @@
 #include "renderer.hpp"
 
-WINDOW*                               Renderer::playfield            = nullptr;
-WINDOW*                               Renderer::info_bar             = nullptr;
-bool                                  Renderer::is_playfield_cleared = false;
-bool                                  Renderer::is_info_bar_cleared  = false;
-std::map<std::string, unsigned short> Renderer::color_map_           = {};
+WINDOW*                                         Renderer::playfield            = nullptr;
+WINDOW*                                         Renderer::info_bar             = nullptr;
+bool                                            Renderer::is_playfield_cleared = false;
+bool                                            Renderer::is_info_bar_cleared  = false;
+std::unordered_map<std::string, unsigned short> Renderer::color_map_           = {};
 
 void Renderer::initScreen()
 {
@@ -91,35 +91,44 @@ WINDOW* Renderer::getWindow(WindowType window_type)
   }
   return nullptr;
 }
-void Renderer::drawChar(int x, int y, char ch, const std::string& color_name, WindowType window_type)
+void Renderer::drawChar(int x, int y, char ch, WindowType window_type)
 {
   WINDOW* window = getWindow(window_type);
   if (!window)
     return;
-  int color = getColor(color_name);
+  int color = getColor("TEXT_COLOR");
   wattron(window, COLOR_PAIR(color));
   mvwaddch(window, y, x, ch);
   wattroff(window, COLOR_PAIR(color));
 }
 
-void Renderer::drawText(int x, int y, const std::string& text, const std::string& color_name, WindowType window_type)
+void Renderer::drawText(int x, int y, const std::string& text, bool is_selected, WindowType window_type)
 {
   WINDOW* window = getWindow(window_type);
   if (!window)
     return;
-  int color = getColor(color_name);
+  int color = is_selected ? getColor("SELECTED_TEXT_COLOR") : getColor("TEXT_COLOR");
   wattron(window, COLOR_PAIR(color));
   mvwprintw(window, y, x, "%s", text.c_str());
   wattroff(window, COLOR_PAIR(color));
 }
 
-void Renderer::drawEntity(const Entity& entity, const std::string& color_name, WindowType window_type)
+void Renderer::drawEntity(const Entity& entity, WindowType window_type)
 {
   WINDOW* window = getWindow(window_type);
   if (!window)
     return;
-  int color = getColor(color_name);
+  unsigned short color = entity.getColorPair();
   wattron(window, COLOR_PAIR(color));
+  const std::vector<std::vector<char>>* current_frame;
+  if (entity.animator_.isAnimationRunning() && !entity.animator_.isAnimationFinished())
+  {
+    current_frame = &entity.animator_.getCurrentFrame();
+  }
+  else
+  {
+    current_frame = &entity.getAppearance();
+  }
 
   for (int i = 0; i < entity.getHeight(); ++i)
   {
@@ -129,10 +138,11 @@ void Renderer::drawEntity(const Entity& entity, const std::string& color_name, W
           window,
           i + entity.getPosY(),
           j + entity.getPosX(),
-          entity.getAppearance()[i][j]);
+          (*current_frame)[i][j]);
     }
   }
   wattroff(window, COLOR_PAIR(color));
+  delete current_frame;
 }
 
 void Renderer::refreshWindow(WindowType window_type)

@@ -1,7 +1,7 @@
 #include "player.hpp"
 
 Player::Player()
-    : Shooter()
+    : Entity()
 {
   const std::vector<std::vector<char>> appearance = {
     { '/', '|', '|', '\\' },
@@ -19,13 +19,12 @@ std::unique_ptr<Bullet> Player::shoot()
 {
   if (canShoot())
   {
-    // incrementCurrentBullets();
     resetReloadFrameDelay();
     return std::make_unique<Bullet>(
         getPosX() + getWidth() / 2,
         getPosY() - 1,
-        -1,
-        "PLAYER_BULLET_COLOR",
+        Bullet::BulletDirection::UP,
+        getBulletColor(),
         getBulletAppearance());
   }
   return nullptr;
