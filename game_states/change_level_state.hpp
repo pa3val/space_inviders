@@ -14,7 +14,7 @@ private:
   unsigned short show_time_ = 0;
 
 public:
-  ChangeLevelState(unsigned long score, const std::string& next_level, unsigned short show_time);
+  ChangeLevelState(const unsigned long score, const std::string& next_level, const unsigned short show_time);
   void           handleInput(Input input) override;
   void           update() override;
   void           draw() override;

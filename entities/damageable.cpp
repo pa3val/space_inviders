@@ -1,6 +1,6 @@
 #include "damageable.hpp"
 
-void Damageable::takeDamage(unsigned int damage)
+void Damageable::takeDamage(const unsigned int damage)
 {
   if (getHealth() <= damage)
     setHealth(0);

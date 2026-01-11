@@ -15,7 +15,6 @@
 #include <queue>
 #include <sol/sol.hpp>
 
-
 class GameManager
 {
 private:
@@ -27,5 +26,5 @@ public:
   GameManager();
   void runGame();
   void handleSignal();
-  void setupLevelQueue(std::string first_level);
+  void setupLevelQueue(const std::string& first_level);
 };

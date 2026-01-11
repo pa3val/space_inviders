@@ -2,7 +2,7 @@
 
 #include "constants.hpp"
 
-ChangeLevelState::ChangeLevelState(unsigned long score, const std::string& next_level, unsigned short show_time)
+ChangeLevelState::ChangeLevelState(const unsigned long score, const std::string& next_level, const unsigned short show_time)
     : score_(score)
     , next_level_(next_level)
     , show_time_(show_time)

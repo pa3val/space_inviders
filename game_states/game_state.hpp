@@ -6,7 +6,7 @@ class GameState
 public:
   GameState() { };
   virtual ~GameState() = default;
-  virtual void handleInput(Input input) { };
+  virtual void handleInput(const Input input) { };
   virtual void update() { };
   virtual void draw() { };
 };

@@ -31,8 +31,10 @@ private:
 
 public:
   LevelState();
-  void          handleInput(Input input) override;
+  void          handleInput(const Input input) override;
   void          update() override;
+  void          checkCollisions();
+  void          eraseVectors();
   void          moveEnemies();
   void          shootEnemies();
   void          draw() override;

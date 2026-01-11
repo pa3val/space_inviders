@@ -18,8 +18,8 @@ private:
   };
 
 public:
-  GameOverState(int score = 0);
-  void handleInput(Input input) override;
+  GameOverState(const int score = 0);
+  void handleInput(const Input input) override;
   void update() override { };
   void draw() override;
 };

@@ -19,7 +19,7 @@ public:
   bool                                  canShoot() const;
   void                                  resetReloadFrameDelay();
   void                                  updateReloadFrameDelay();
-  void                                  setReloadFrameDelay(unsigned short reload_frame_delay);
+  void                                  setReloadFrameDelay(const unsigned short reload_frame_delay);
   void                                  setBulletAppearance(const std::vector<std::vector<char>>& bullet_appearance);
   void                                  setBulletColor(const unsigned short bullet_color_pair) { bullet_color_pair_ = bullet_color_pair; }
   const std::vector<std::vector<char>>& getBulletAppearance() const;

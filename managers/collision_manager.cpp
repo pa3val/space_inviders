@@ -2,7 +2,7 @@
 
 #include "constants.hpp"
 
-bool CollisionManager::checkBounderCollision(const Entity& entity, short delta_x, short delta_y)
+bool CollisionManager::checkBounderCollision(const Entity& entity, const short delta_x, const short delta_y)
 {
   int new_pos_x = entity.getPosX() + static_cast<int>(delta_x);
   int new_pos_y = entity.getPosY() + static_cast<int>(delta_y);

@@ -17,17 +17,17 @@ public:
 
   Entity();
   virtual ~Entity() = default;
-  virtual void                          update(short delta_x, short delta_y);
+  virtual void                          update(const short delta_x, const short delta_y);
   int                                   getPosX() const { return pos_x_; }
   int                                   getPosY() const { return pos_y_; }
   unsigned int                          getHeight() const { return height_; }
   unsigned int                          getWidth() const { return width_; }
   const std::vector<std::vector<char>>& getAppearance() const { return appearance_; }
   unsigned short                        getColorPair() const { return color_pair_; }
-  void                                  setPosX(int pos_x) { pos_x_ = pos_x; }
-  void                                  setPosY(int pos_y) { pos_y_ = pos_y; }
-  void                                  setWidth(unsigned int width) { width_ = width; }
-  void                                  setHeight(unsigned int height) { height_ = height; }
+  void                                  setPosX(const int pos_x) { pos_x_ = pos_x; }
+  void                                  setPosY(const int pos_y) { pos_y_ = pos_y; }
+  void                                  setWidth(const unsigned int width) { width_ = width; }
+  void                                  setHeight(const unsigned int height) { height_ = height; }
   void                                  setAppearance(const std::vector<std::vector<char>>& appearance)
   {
     appearance_ = appearance;

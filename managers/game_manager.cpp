@@ -105,7 +105,7 @@ void GameManager::handleSignal()
   }
 }
 
-void GameManager::setupLevelQueue(std::string first_level)
+void GameManager::setupLevelQueue(const std::string& first_level)
 {
   level_queue_ = std::queue<std::string>();
   lua_.open_libraries(sol::lib::base, sol::lib::package);

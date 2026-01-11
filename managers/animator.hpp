@@ -17,7 +17,7 @@ public:
   void                                  startAnimation();
   void                                  updateAnimation();
   const std::vector<std::vector<char>>& getCurrentFrame() const { return animation_frames_[current_frame_]; }
-  void                                  setFrameDelay(unsigned short frame_delay) { frame_delay_ = frame_delay; }
+  void                                  setFrameDelay(const unsigned short frame_delay) { frame_delay_ = frame_delay; }
   void                                  setAnimationFrames(const std::vector<std::vector<std::vector<char>>> animation_frames) { animation_frames_ = animation_frames; }
   bool                                  isAnimationFinished() const { return is_animation_finished_; }
   bool                                  isAnimationRunning() const { return is_animation_running_; }

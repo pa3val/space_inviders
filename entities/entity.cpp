@@ -6,7 +6,7 @@ Entity::Entity()
   pos_y_ = 0;
 }
 
-void Entity::update(short delta_x, short delta_y)
+void Entity::update(const short delta_x, const short delta_y)
 {
   pos_x_ += delta_x;
   pos_y_ += delta_y;

@@ -20,7 +20,7 @@ void Shooter::resetReloadFrameDelay()
   current_reload_frame_delay_ = reload_frame_delay_;
 }
 
-void Shooter::setReloadFrameDelay(unsigned short reload_frame_delay)
+void Shooter::setReloadFrameDelay(const unsigned short reload_frame_delay)
 {
   reload_frame_delay_ = reload_frame_delay;
 }

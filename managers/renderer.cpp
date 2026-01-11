@@ -47,17 +47,25 @@ void Renderer::initColorMap()
   sol::state lua;
   lua.open_libraries(sol::lib::base, sol::lib::package);
   lua.script_file("global_config.lua");
-  sol::table     colors            = lua["colors"];
-  unsigned short color_pair_number = 1;
+  sol::table colors = lua["colors"];
+
+  std::vector<std::string> color_names;
   for (auto& [key, value] : colors)
   {
-    RGBColor color = parseColorHex(value.as<std::string>());
+    color_names.push_back(key.as<std::string>());
+  }
+  std::sort(color_names.begin(), color_names.end());
+
+  unsigned short color_pair_number = 1;
+  for (const auto& color_name : color_names)
+  {
+    RGBColor color = parseColorHex(colors[color_name].get<std::string>());
     init_color(color_pair_number, color.red, color.green, color.blue);
-    if (key.as<std::string>() == "SELECTED_TEXT_COLOR")
+    if (color_name == "SELECTED_TEXT_COLOR")
       init_pair(color_pair_number, COLOR_BLACK, color_pair_number);
     else
       init_pair(color_pair_number, color_pair_number, COLOR_BLACK);
-    color_map_[key.as<std::string>()] = color_pair_number;
+    color_map_[color_name] = color_pair_number;
     ++color_pair_number;
   }
 }
@@ -68,7 +76,7 @@ void Renderer::resetFlags()
   is_info_bar_cleared  = false;
 }
 
-WINDOW* Renderer::getWindow(WindowType window_type)
+WINDOW* Renderer::getWindow(const WindowType window_type)
 {
   switch (window_type)
   {
@@ -91,7 +99,7 @@ WINDOW* Renderer::getWindow(WindowType window_type)
   }
   return nullptr;
 }
-void Renderer::drawChar(int x, int y, char ch, WindowType window_type)
+void Renderer::drawChar(const int x, const int y, const char ch, const WindowType window_type)
 {
   WINDOW* window = getWindow(window_type);
   if (!window)
@@ -102,7 +110,7 @@ void Renderer::drawChar(int x, int y, char ch, WindowType window_type)
   wattroff(window, COLOR_PAIR(color));
 }
 
-void Renderer::drawText(int x, int y, const std::string& text, bool is_selected, WindowType window_type)
+void Renderer::drawText(const int x, const int y, const std::string& text, const bool is_selected, const WindowType window_type)
 {
   WINDOW* window = getWindow(window_type);
   if (!window)
@@ -113,7 +121,7 @@ void Renderer::drawText(int x, int y, const std::string& text, bool is_selected,
   wattroff(window, COLOR_PAIR(color));
 }
 
-void Renderer::drawEntity(const Entity& entity, WindowType window_type)
+void Renderer::drawEntity(const Entity& entity, const WindowType window_type)
 {
   WINDOW* window = getWindow(window_type);
   if (!window)
@@ -144,7 +152,7 @@ void Renderer::drawEntity(const Entity& entity, WindowType window_type)
   wattroff(window, COLOR_PAIR(color));
 }
 
-void Renderer::refreshWindow(WindowType window_type)
+void Renderer::refreshWindow(const WindowType window_type)
 {
   WINDOW* window = (window_type == WindowType::PLAYFIELD) ? playfield : info_bar;
   if (!window)
@@ -161,7 +169,7 @@ void Renderer::updateScreen()
   doupdate();
 }
 
-void Renderer::clearWindow(WindowType window_type)
+void Renderer::clearWindow(const WindowType window_type)
 {
   WINDOW* window = (window_type == WindowType::PLAYFIELD) ? playfield : info_bar;
   if (!window)
@@ -174,7 +182,7 @@ void Renderer::wait(int millis)
   napms(millis);
 }
 
-void Renderer::destroyWindow(WindowType window_type)
+void Renderer::destroyWindow(const WindowType window_type)
 {
   WINDOW* window = (window_type == WindowType::PLAYFIELD) ? playfield : info_bar;
   if (!window)

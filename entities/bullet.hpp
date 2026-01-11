@@ -17,14 +17,14 @@ private:
   unsigned int    damage_ = 1;
 
 public:
-  Bullet(int                                p_x,
-      int                                   p_y,
-      BulletDirection                       direction,
-      unsigned short                        color_pair,
+  Bullet(const int                          p_x,
+      const int                             p_y,
+      const BulletDirection                 direction,
+      const unsigned short                  color_pair,
       const std::vector<std::vector<char>>& appearance);
 
   virtual ~Bullet() = default;
-  void            update(short delta_x = 0, short delta_y = 0) override;
+  void            update(const short delta_x = 0, const short delta_y = 0) override;
   BulletDirection getDirection() const { return direction_; }
   unsigned int    getDamage() const { return damage_; }
 };

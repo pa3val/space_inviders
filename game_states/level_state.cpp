@@ -11,7 +11,7 @@ LevelState::LevelState()
   AudioManager::playBackgroundMusic();
 }
 
-void LevelState::handleInput(Input input)
+void LevelState::handleInput(const Input input)
 {
   short delta_x = 0, delta_y = 0;
 
@@ -54,6 +54,37 @@ void LevelState::update()
         shooter_enemy->updateReloadFrameDelay();
       enemy->updateCurrentEnemyMovementDelay();
       enemy->animator_.updateAnimation();
+    }
+  }
+
+  checkCollisions();
+  eraseVectors();
+
+  if (enemy_pool_.empty())
+  {
+    SignalManager::setSignal(Signals::GAME_WIN);
+    return;
+  }
+
+  moveEnemies();
+  shootEnemies();
+
+  for (auto& bullet : bullet_pool_)
+  {
+    bullet->update();
+  }
+  if (!bullet_pool_.empty())
+    draw_flags_ |= SignalManager::DrawFlags::DRAW_PLAYFIELD;
+}
+
+void LevelState::checkCollisions()
+{
+  for (auto& row : enemy_pool_)
+  {
+    for (auto& enemy : row)
+    {
+      if (!enemy->isAlive())
+        continue;
       if (CollisionManager::checkCollision(player_, *enemy))
       {
         SignalManager::setSignal(Signals::GAME_OVER);
@@ -113,7 +144,10 @@ void LevelState::update()
     }
     ++bullet;
   }
+}
 
+void LevelState::eraseVectors()
+{
   bullet_pool_.erase(
       std::remove_if(bullet_pool_.begin(), bullet_pool_.end(),
           [this](const auto& bullet)
@@ -153,22 +187,6 @@ void LevelState::update()
             return row.empty();
           }),
       enemy_pool_.end());
-
-  if (enemy_pool_.empty())
-  {
-    SignalManager::setSignal(Signals::GAME_WIN);
-    return;
-  }
-
-  moveEnemies();
-  shootEnemies();
-
-  for (auto& bullet : bullet_pool_)
-  {
-    bullet->update();
-  }
-  if (!bullet_pool_.empty())
-    draw_flags_ |= SignalManager::DrawFlags::DRAW_PLAYFIELD;
 }
 
 void LevelState::moveEnemies()

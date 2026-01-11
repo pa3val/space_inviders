@@ -1,11 +1,11 @@
 #include "game_over_state.hpp"
 
-GameOverState::GameOverState(int score)
+GameOverState::GameOverState(const int score)
     : score_(score)
 {
 }
 
-void GameOverState::handleInput(Input input)
+void GameOverState::handleInput(const Input input)
 {
   switch (input)
   {

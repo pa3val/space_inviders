@@ -1,10 +1,10 @@
 #include "bullet.hpp"
 
 Bullet::Bullet(
-    int                                   p_x,
-    int                                   p_y,
-    BulletDirection                       direction,
-    unsigned short                        color_pair,
+    const int                             p_x,
+    const int                             p_y,
+    const BulletDirection                 direction,
+    const unsigned short                  color_pair,
     const std::vector<std::vector<char>>& appearance)
     : Entity()
     , direction_(direction)
@@ -17,7 +17,7 @@ Bullet::Bullet(
   setColor(color_pair);
 }
 
-void Bullet::update(short delta_x, short delta_y)
+void Bullet::update(const short delta_x, const short delta_y)
 {
   setPosY(static_cast<int>(getPosY() + static_cast<int>(direction_)));
 }

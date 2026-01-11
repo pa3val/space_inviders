@@ -13,7 +13,6 @@ void AudioManager::initSounds()
   ma_engine_start(&engine_);
   lua_.open_libraries(sol::lib::base, sol::lib::package);
   lua_.script_file("global_config.lua");
-
   sol::table sounds = lua_["sounds"];
 
   for (auto& [key, value] : sounds)

@@ -31,7 +31,7 @@ void MenuState::draw()
   Renderer::drawText(PLAYFIELD_WIDTH / 2 + buttons_text_[0].length() / 2 + 3, PLAYFIELD_HEIGHT / 2, '<' + level_files_[selected_level_] + '>', false, Renderer::WindowType::PLAYFIELD);
 }
 
-void MenuState::handleInput(Input input)
+void MenuState::handleInput(const Input input)
 {
   switch (input)
   {

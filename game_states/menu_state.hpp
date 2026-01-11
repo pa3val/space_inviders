@@ -20,14 +20,14 @@ private:
     "Start",
     "Exit"
   };
-  
+
   std::vector<std::string> level_files_;
 
   void getFilesInDirectory(const std::filesystem::path& path);
 
 public:
   MenuState();
-  void handleInput(Input input) override;
+  void handleInput(const Input input) override;
   void update() override { };
   void draw() override;
 };
